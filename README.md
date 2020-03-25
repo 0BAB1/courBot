@@ -1,4 +1,4 @@
-# bienvenue
+# Bienvenue, spectateurs de INITIAL PLAY
 
 si vous etes sur cette page c'est que vous avez suivis mon tuto et que vous avez beoins du code, servez vous!
 
