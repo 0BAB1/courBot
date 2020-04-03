@@ -4,6 +4,7 @@ const fs = require('fs');
 const bot = new Discord.Client();
 bot.config = require('./config.json');
 bot.commands = new Discord.Collection();
+bot.mutes = require("./mutes.json");
 
 fs.readdir("./commands", (err, files)=>{
     if(err) console.error(err);
@@ -34,6 +35,27 @@ bot.on("ready", async () => {
     }catch(e){
         console.log(e.stack);
     }
+
+    bot.setInterval(async () => {
+        for(let i in bot.mutes){
+            let time = bot.mutes[i].time;
+            let guildId = bot.mutes[i].guild;
+            let guild = bot.guilds.cache.get(guildId);
+            let member = guild.members.cache.get(i);
+            let mutedRole = guild.roles.cache.find(r => r.name === "Muted");
+            if(!mutedRole) continue;
+
+            if(Date.now() > time){
+                member.roles.remove(mutedRole);
+                delete bot.mutes[i];
+
+                fs.writeFile("./mutes.json", JSON.stringify(bot.mutes, null, 4), err =>{
+                    if(err) throw err;
+                    console.log("unmute");
+                });
+            }
+        }
+    } , 5000);
 });
 
 bot.on("message" ,async (msg) => {
